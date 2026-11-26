@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TravelTalk — 지금 여기서 바로 쓰는 여행 표현</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!--
+    화면 문구는 data-i18n="키"로 표시하고, 실제 문구는 js/i18n.js의 ko/en 사전에 있어요.
+    여기 적힌 한국어는 스크립트가 돌기 전 잠깐 보이는 기본값이에요.
+  -->
+  <div class="app">
+    <!-- ========== 홈 ========== -->
+    <main class="screen is-active" id="screen-home" data-screen="home">
+      <header class="hero">
+        <h1 class="logo">TravelTalk</h1>
+        <p class="tagline" data-i18n="app.tagline">지금 있는 곳에서 바로 말할 수 있는 한마디</p>
+      </header>
+
+      <!-- 현재 위치 -->
+      <section class="card location-card" aria-labelledby="loc-title">
+        <div class="location-row">
+          <span class="location-pin" aria-hidden="true">📍</span>
+          <div class="location-text">
+            <p class="label" id="loc-title" data-i18n="loc.title">현재 위치</p>
+            <p class="location-city" id="location-city">아직 확인 전이에요</p>
+          </div>
+          <button type="button" class="btn-text" id="btn-locate">위치 찾기</button>
+        </div>
+        <p class="location-note" id="location-note" aria-live="polite"></p>
+        <button type="button" class="btn-link" id="btn-manual" data-i18n="loc.manual">직접 고르기</button>
+
+        <!-- 위치 권한 거부/실패 시 또는 '직접 고르기'를 눌렀을 때 -->
+        <div class="manual-picker" id="manual-picker" hidden>
+          <label class="sr-only" for="country-select" data-i18n="loc.country">국가</label>
+          <select id="country-select">
+            <option value="" data-i18n="loc.selectCountry">국가 선택</option>
+          </select>
+          <label class="sr-only" for="city-select" data-i18n="loc.city">도시</label>
+          <select id="city-select" disabled>
+            <option value="" data-i18n="loc.selectCity">도시 선택</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- 언어 선택 -->
+      <section class="field" aria-labelledby="lang-title">
+        <h2 class="field-title" id="lang-title" data-i18n="home.language">언어</h2>
+        <div class="chip-group" role="radiogroup" aria-labelledby="lang-title" id="lang-group">
+          <button type="button" class="chip" role="radio" aria-checked="false" data-lang="fr">🇫🇷 <span data-i18n="lang.fr">프랑스어</span></button>
+          <button type="button" class="chip" role="radio" aria-checked="false" data-lang="ja">🇯🇵 <span data-i18n="lang.ja">일본어</span></button>
+          <button type="button" class="chip" role="radio" aria-checked="false" data-lang="es">🇪🇸 <span data-i18n="lang.es">스페인어</span></button>
+          <!-- 화면 언어와 같은 언어 칩은 숨김 (한국어 화면 → 한국어 칩 숨김, English 화면 → 영어 칩 숨김) -->
+          <button type="button" class="chip" role="radio" aria-checked="false" data-lang="ko">🇰🇷 <span data-i18n="lang.ko">한국어</span></button>
+          <button type="button" class="chip" role="radio" aria-checked="false" data-lang="en">🇺🇸 <span data-i18n="lang.en">영어</span></button>
+        </div>
+      </section>
+
+      <!-- 장소 유형 선택 -->
+      <section class="field" aria-labelledby="place-title">
+        <h2 class="field-title" id="place-title" data-i18n="home.place">어디에 있나요?</h2>
+        <div class="place-grid" role="radiogroup" aria-labelledby="place-title" id="place-group">
+          <button type="button" class="place" role="radio" aria-checked="false" data-place="restaurant"><span class="place-icon">🍽️</span><span data-i18n="place.restaurant">식당</span></button>
+          <button type="button" class="place" role="radio" aria-checked="false" data-place="cafe"><span class="place-icon">☕</span><span data-i18n="place.cafe">카페</span></button>
+          <button type="button" class="place" role="radio" aria-checked="false" data-place="shop"><span class="place-icon">🛍️</span><span data-i18n="place.shop">상점</span></button>
+          <button type="button" class="place" role="radio" aria-checked="false" data-place="transport"><span class="place-icon">🚆</span><span data-i18n="place.transport">교통</span></button>
+          <button type="button" class="place" role="radio" aria-checked="false" data-place="hotel"><span class="place-icon">🏨</span><span data-i18n="place.hotel">숙소</span></button>
+          <button type="button" class="place" role="radio" aria-checked="false" data-place="sight"><span class="place-icon">🏛️</span><span data-i18n="place.sight">관광지</span></button>
+        </div>
+      </section>
+
+      <!-- 상황 입력 -->
+      <section class="field">
+        <label class="field-title" for="situation"><span data-i18n="home.situation">어떤 상황인가요?</span> <span class="optional" data-i18n="home.optional">(선택)</span></label>
+        <textarea id="situation" rows="2" maxlength="100"
+          data-i18n-placeholder="home.situationPlaceholder"
+          placeholder="예: 채식 메뉴가 있는지 묻고 싶어요"></textarea>
+        <div class="hint-chips" id="hint-chips" data-i18n-aria-label="home.keywordsAria" aria-label="자주 쓰는 키워드">
+          <button type="button" class="hint" data-i18n="kw.order">주문</button>
+          <button type="button" class="hint" data-i18n="kw.recommend">추천</button>
+          <button type="button" class="hint" data-i18n="kw.vegetarian">채식</button>
+          <button type="button" class="hint" data-i18n="kw.directions">길</button>
+          <button type="button" class="hint" data-i18n="kw.discount">할인</button>
+          <button type="button" class="hint" data-i18n="kw.reservation">예약</button>
+        </div>
+      </section>
+
+      <button type="button" class="btn-primary" id="btn-recommend" data-i18n="home.submit" disabled>표현 추천받기</button>
+      <p class="form-hint" id="form-hint"></p>
+    </main>
+
+    <!-- ========== 결과 ========== -->
+    <main class="screen" id="screen-result" data-screen="result" hidden>
+      <header class="top-bar">
+        <button type="button" class="btn-back" data-go="home" data-i18n-aria-label="result.back" aria-label="홈으로">←</button>
+        <h1 class="top-title" data-i18n="result.title">추천 표현</h1>
+      </header>
+
+      <!-- 장소 유형·도시·상황 요약 -->
+      <section class="result-context" id="result-context" data-i18n-aria-label="result.contextAria" aria-label="추천 조건"></section>
+
+      <!-- 맞는 표현이 없을 때 안내 + 영어 확인 문장 -->
+      <section class="fallback-box" id="fallback-box" hidden></section>
+
+      <!-- 표현 카드 목록 -->
+      <ol class="phrase-list" id="phrase-list" aria-live="polite"></ol>
+
+      <button type="button" class="btn-secondary" id="btn-more" data-i18n="result.more">↻ 다른 표현 보기</button>
+      <p class="more-hint" id="more-hint"></p>
+    </main>
+
+    <!-- 짧은 알림 -->
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <!-- ========== 저장한 표현 ========== -->
+    <main class="screen" id="screen-saved" data-screen="saved" hidden>
+      <header class="top-bar">
+        <h1 class="top-title" data-i18n="saved.title">저장한 표현</h1>
+        <span class="saved-count" id="saved-count"></span>
+      </header>
+
+      <div class="placeholder saved-empty" id="saved-empty">
+        <p><span data-i18n="saved.empty1">아직 저장한 표현이 없어요.</span><br /><span data-i18n="saved.empty2">추천 결과에서 🔖 저장을 눌러 보세요.</span></p>
+        <button type="button" class="btn-secondary" data-go="home" data-i18n="saved.goHome">표현 추천받으러 가기</button>
+      </div>
+
+      <div id="saved-groups"></div>
+    </main>
+
+    <!-- ========== 설정 ========== -->
+    <main class="screen" id="screen-settings" data-screen="settings" hidden>
+      <header class="top-bar"><h1 class="top-title" data-i18n="settings.title">설정</h1></header>
+
+      <section class="settings-group" aria-labelledby="set-uilang">
+        <h2 id="set-uilang" data-i18n="settings.uiLangGroup">언어</h2>
+        <div class="settings-row">
+          <span id="uilang-label" data-i18n="settings.uiLang">서비스 언어</span>
+          <!-- 언어 이름은 어느 화면 언어에서든 그 언어로 표시 -->
+          <div class="segmented" role="radiogroup" aria-labelledby="uilang-label" id="uilang-group">
+            <button type="button" role="radio" aria-checked="false" data-uilang="ko" lang="ko">한국어</button>
+            <button type="button" role="radio" aria-checked="false" data-uilang="en" lang="en">English</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-group" aria-labelledby="set-speech">
+        <h2 id="set-speech" data-i18n="settings.speech">발음</h2>
+        <div class="settings-row">
+          <span id="rate-label" data-i18n="settings.rate">읽기 속도</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="rate-label" id="rate-group">
+            <button type="button" role="radio" aria-checked="false" data-rate="0.7" data-i18n="settings.rateSlow">느리게</button>
+            <button type="button" role="radio" aria-checked="false" data-rate="0.9" data-i18n="settings.rateNormal">보통</button>
+          </div>
+        </div>
+        <label class="settings-row" for="toggle-pron">
+          <span><span data-i18n="settings.showPron">한글 발음 표시</span><small data-i18n="settings.showPronHelp">끄면 현지어 문장만 보고 연습할 수 있어요</small></span>
+          <input type="checkbox" class="switch" id="toggle-pron" />
+        </label>
+        <div class="settings-row settings-voices">
+          <span><span data-i18n="settings.voices">기기 음성</span><small data-i18n="settings.voicesHelp">목소리가 없으면 기본 목소리로 읽어요</small></span>
+          <ul class="voice-list" id="voice-list"></ul>
+        </div>
+      </section>
+
+      <section class="settings-group" aria-labelledby="set-data">
+        <h2 id="set-data" data-i18n="settings.data">내 데이터</h2>
+        <div class="settings-row">
+          <span><span data-i18n="settings.savedPhrases">저장한 표현</span><small id="set-saved-count"></small></span>
+          <button type="button" class="btn-danger" id="btn-clear-saved" data-i18n="settings.clearAll">모두 지우기</button>
+        </div>
+        <div class="settings-row">
+          <span><span data-i18n="settings.city">기억한 도시</span><small id="set-city"></small></span>
+          <button type="button" class="btn-danger" id="btn-clear-city" data-i18n="settings.clear">지우기</button>
+        </div>
+      </section>
+
+      <section class="settings-group" aria-labelledby="set-info">
+        <h2 id="set-info" data-i18n="settings.about">정보</h2>
+        <p class="settings-info" id="settings-info"></p>
+      </section>
+    </main>
+
+    <!-- ========== 하단 탭 ========== -->
+    <nav class="tab-bar" data-i18n-aria-label="tab.aria" aria-label="주요 메뉴">
+      <button type="button" class="tab is-active" data-tab="home" aria-current="page">
+        <span class="tab-icon" aria-hidden="true">🏠</span><span data-i18n="tab.home">홈</span>
+      </button>
+      <button type="button" class="tab" data-tab="saved">
+        <span class="tab-icon" aria-hidden="true">🔖</span><span data-i18n="tab.saved">저장한 표현</span>
+        <span class="tab-badge" id="tab-badge" hidden></span>
+      </button>
+      <button type="button" class="tab" data-tab="settings">
+        <span class="tab-icon" aria-hidden="true">⚙️</span><span data-i18n="tab.settings">설정</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- 데이터 JS 사본: file://로 열었을 때 fetch 대신 사용 (tools/sync_data.py가 생성) -->
+  <script src="data/cities.js"></script>
+  <script src="data/phrases.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/recommend.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
